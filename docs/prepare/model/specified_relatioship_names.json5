@@ -1,0 +1,8 @@
+{
+  // 有可能relationship的命名冲突。这里指定命名。
+  // 注意，命名不要用复数，系统会自动计算复数
+  specified_relationship_names: {
+    "sampling_task_sampler.task_id": "sampler_task",
+    "sampling_task_driver.task_id": "driver_task"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  response_schemas: [
+    {
+      module: 'laboratory',
+      schema: "Order",
+      name: "cycle_round_point_sample",
+      expressions: ["cycles", "cycles.rounds", "points","samples"]
+    },
+    {
+      module: 'laboratory',
+      schema: "Order",
+      name: "order_with_points_and_samples_and_samplers_1",
+      expressions: ["points", "points.samples", "samples.samplers"]
+    },
+    {
+      module: 'laboratory',
+      schema: "Order",
+      name: "order_sample_point_cycle_round",
+      expressions: ["points", "points.samples", "samples.samplers", "cycles", "cycles.rounds"]
+    },
+    {
+      module: 'laboratory',
+      schema: "Order",
+      name: "order_cycle_point_round_result",
+      expressions: ["points", "cycles", "attachments", "samples", "tests", "cycles.rounds", "points.parameters",
+        "samples.results", "samples.equipments", "samples.samplers", "tests.item"]
+    }
+  ],
+}

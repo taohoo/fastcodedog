@@ -1,0 +1,63 @@
+{
+  /*
+  * 注意crud是sqlalchemy的格式
+  */
+  // 系统会根据schema配置自动生成默认create，update，get。
+  // 系统会根据unique的配置，自动生成根据uinique的精确查找
+  // 系统会根据外键，每个外键创建一个查询方法
+  // 系统会根据多对多关联表，创建查询方法
+  queries: [
+    {
+      name: "base",
+      model: "User",
+      module: "admin",
+      summary: "综合查询",
+      description: "根据工号、姓名、手机号、邮箱、是否启用查询。",
+      parameters: {
+          number: {
+            name: 'number',
+            type: 'str',
+            description: '工号'
+          },
+          name: {
+            name: 'name',
+            type: 'str',
+            description: '{admin.User.name}'
+          },
+          telephone: {name: 'telephone', type: 'str', description: '{admin.User.telephone}'},
+          email: {name: 'email', type: 'str', description: '{admin.User.email}'},
+          enabled: {name: 'enabled', type: 'bool', description: '{admin.User.enabled}'}
+      },
+      filters: [
+          // 如果filter中包含了nullable的参数，会条件if条件，只要这个filter中任一参数没有参数，就不会添加这个filter
+          "User.number.like(f'%{number}%')",
+          "User.name.like(f'%{name}%')",
+          "User.telephone.like(f'%{telephone}%')",
+          "User.email.like(f'%{email}%')",
+          "User.enabled == enabled"
+      ]
+    },
+//    { // 已经用系统的标准能力替代，这里留着是因为有别名的例子
+//      name: "user_by_organization",
+//      model: "User",
+//      module: "admin",
+//      summary: "获取组织下的用户",
+//      parameters: {
+//        organization_id: {
+//          name: 'organization_id',
+//          type: 'int',
+//          nullable: false
+//        }
+//      },
+//      aliases: {
+//        'uo': 'User.organizations'
+//      },
+//      joins: [
+//        'uo'
+//      ],
+//      filters: [
+//        'uo.id == organization_id'
+//      ]
+//    }
+  ]
+}

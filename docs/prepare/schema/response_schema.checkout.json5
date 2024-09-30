@@ -1,0 +1,13 @@
+{
+  response_schemas: [
+    {
+      module: 'sampling',
+      schema: "Checkout",
+      name: "checkout_with_equipments_and_people",
+      expressions: [
+        "equipments",
+        "people"
+      ]
+    }
+  ]
+}

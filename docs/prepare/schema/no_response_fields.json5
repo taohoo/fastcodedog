@@ -1,0 +1,6 @@
+{   // 不允许返回的属性
+    no_response_fields: [
+      // "tenant_id",   // 启用租户的时候会自动添加
+      "password"
+    ]
+}

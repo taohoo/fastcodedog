@@ -1,0 +1,25 @@
+{
+  disable_relationships: [
+    {
+      // 系统默认建议的子对象，有时候不需要。比如定单表关联用户，但是不能在用户表创建用户的所有定单这个变量，否则数据量太大。所以需要禁用
+        module: 'admin',
+        model_name: 'User',
+        sub_object_patterns: ['^(?!.*organizations)(?!.*roles).*']   // 用正则表达式，只保留指定的变量
+    },
+    {
+        module: 'resouce',
+        model_name: 'Person',
+        sub_object_patterns: ['^(?!.*catalog).*']   // 用正则表达式
+    },
+    {
+        module: 'resouce',
+        model_name: 'Equipment',
+        sub_object_patterns: ['^(?!.*equipment_modes).*']   // 用正则表达式
+    },
+    {
+        module: 'rule',
+        model_name: 'Define',
+        sub_object_patterns: ['^(?!.*conditions)(?!.*define_variables).*']   // 用正则表达式
+    }
+  ]
+}

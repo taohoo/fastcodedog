@@ -1,0 +1,17 @@
+{
+  response_schemas: [
+    {
+      module: 'admin',
+      schema: "Organization",
+      name: "organizations_with_children",
+      expressions: ["children.children.children.children.children.children"]
+    },
+//    {
+//      // 测试，一个类下面的多个对象
+//      module: 'admin',
+//      schema: "Organization",
+//      name: "organizations_about_roles_with_users_and_menus",
+//      expressions: ["users.roles.users", "users.roles.menus"]
+//    }
+  ]
+}

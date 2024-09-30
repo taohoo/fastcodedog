@@ -1,0 +1,12 @@
+{
+  // 别名转化器，在生成代码时就转化好的版本
+    alias_generator: {
+      import_: {
+        from_: 'review.util.case_converter',
+        import_: 'snake_to_camel'
+      },
+      // importlib.import_module('fastcodegen.util.case_convert')
+      function: 'snake_to_camel',
+      // func = getattr(module, 'snake_to_camel')
+    }
+}

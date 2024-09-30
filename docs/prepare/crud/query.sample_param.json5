@@ -1,0 +1,40 @@
+{
+  /*
+  * 注意crud是sqlalchemy的格式
+  */
+  // 系统会根据schema配置自动生成默认create，update，get。
+  // 系统会根据unique的配置，自动生成根据uinique的精确查找
+  // 系统会根据外键，每个外键创建一个查询方法
+  // 系统会根据多对多关联表，创建查询方法
+  queries: [
+    {
+      name: "base",
+      model: "Parameter",
+      module: "sampling",
+      summary: "申请单详情页面数据查询",
+      description: "根据样品信息的周期id、频次id、点位id查询。",
+      parameters: {
+        cycle_id: {
+          name: 'cycle_id',
+          type: 'int',
+          description: '周期id'
+        },
+        round_id: {
+          name: 'round_id',
+          type: 'int',
+          description: '频次id'
+        },
+        point_id: {
+          name: 'point_id',
+          type: 'int',
+          description: '点位id'
+        }
+      },
+      filters: [
+        "Parameter.point_id == point_id",
+        "Parameter.cycle_id == cycle_id",
+        "Parameter.round_id == round_id"
+      ]
+    }
+  ]
+}

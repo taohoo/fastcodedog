@@ -1,0 +1,23 @@
+{
+  // 用表来定义
+  additional_foreign_keys: {
+      "admin_user.id": [
+        "create_by",
+        "update_by",
+		"agent_id",
+        "evaluate_by"
+      ],
+      "laboratory_order.id": [
+        "order_id"
+      ],
+      "sampling_sample.id": [
+        "sample_id"
+      ],
+      "sampling_round.id": [
+        "round_id"
+      ],
+      "sampling_point.id": [
+        "point_id"
+      ]
+    }
+}

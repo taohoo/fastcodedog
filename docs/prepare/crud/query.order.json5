@@ -1,0 +1,72 @@
+{
+  /*
+  * 注意crud是sqlalchemy的格式
+  */
+  // 系统会根据schema配置自动生成默认create，update，get。
+  // 系统会根据unique的配置，自动生成根据uinique的精确查找
+  // 系统会根据外键，每个外键创建一个查询方法
+  // 系统会根据多对多关联表，创建查询方法
+  queries: [
+    {
+      name: "base",
+      model: "Order",
+      module: "laboratory",
+      summary: "综合查询",
+      description: "根据定单创建时间查询。",
+      parameters: {
+          create_time_begin: {
+            name: 'create_time_begin',
+            type: 'date',
+            description: '开始时间'
+          },
+          create_time_end: {
+            name: 'create_time_end',
+            type: 'str',
+            description: '结束时间'
+          }
+      },
+      filters: [
+          "Order.create_time >= create_time_begin",
+          "Order.create_time <= create_time_end"
+      ]
+    },
+{
+      name: "base_test",
+      model: "Order",
+      module: "laboratory",
+      summary: "审核单列表综合查询",
+      description: "根据采样日期（申请单日期）、申请单编号、审核状态查询",
+      parameters: {
+          laboratory_order_date_begin: {
+            name: 'laboratory_order_date_begin',
+            type: 'date',
+            description: '开始时间'
+          },
+          laboratory_order_date_end: {
+            name: 'laboratory_order_date_end',
+            type: 'date',
+            description: '结束时间'
+          },
+          laboratory_order_number: {
+            name: 'laboratory_order_number',
+            type: 'str',
+            description: '申请单编号'
+          },
+          laboratory_order_state: {
+              name: 'laboratory_order_state',
+              type: 'str',
+              description: '审核状态'
+          }
+      },
+      filters: [
+          "Order.create_time >= laboratory_order_date_begin",
+          "Order.create_time <= laboratory_order_date_end",
+          "Order.number.like(f'%{laboratory_order_number}%')",
+          "Order.state.like(f'%{laboratory_order_state}%')"
+      ],
+      orders: [
+          "Order.create_time"
+      ]
+    }
+  ]
+}

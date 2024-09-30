@@ -1,0 +1,57 @@
+{
+  queries: [
+    {
+      name: "base",
+      model: "Organization",
+      module: "admin",
+      summary: "综合查询",
+      description: "根据父组织、组织编号、组织名称查询。",
+      parameters: {
+          parent_id: {
+            name: "parent_id",
+            type: 'int',
+            description: '父组织id。如需设置null，在query参数中只加变量名，不赋值',
+            option_none: true,   // 允许指定使用null值
+          },
+          number: {
+            name: "number",
+            type: 'str',
+            description: '{Organization.number}'
+          },
+          name: {
+            name: "name",
+            type: 'str',
+            description: '{Organization.name}'
+          }
+      },
+      filters: [
+          // 如果filter中包含了nullable的参数，会条件if条件，只要这个filter中任一参数没有参数，就不会添加这个filter
+          "Organization.parent_id == parent_id",
+          "Organization.number.like(f'%{number}%')",
+          "Organization.name.like(f'%{name}%')"
+      ]
+    },
+    { // 已经用系统的标准能力替代，这里留着是因为有别名的例子
+      // 对应的表: "admin_ser"
+      name: "user_by_organization",
+      model: "Organization",
+      module: "admin",
+      summary: "获取组织下的用户",
+      parameters: {
+        organization_id: {
+          name: 'organization_id',
+          type: 'int',
+        }
+      },
+      aliases: {
+        'uo': 'User.organizations'
+      },
+      joins: [
+        'uo'
+      ],
+      filters: [
+        'uo.id == organization_id'
+      ]
+    }
+  ]
+}

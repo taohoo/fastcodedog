@@ -1,0 +1,44 @@
+{
+  response_schemas: [
+    {
+      module: 'admin',
+      schema: "User",
+      name: "user_with_organizations",
+      expressions: ["organizations"]
+    },
+    {
+      module: 'admin',
+      schema: "User",
+      name: "user_with_organizations_and_roles",
+      expressions: ["organizations", "roles"]
+    },
+    {
+      module: 'admin',
+      schema: "User",
+      name: "user_with_roles_menus",
+      expressions: ["roles.menus"]
+    }
+  ],
+//  create_schemas: [
+//    {
+//      // 允许级联创建，但必须给出对应类的唯一值或者唯一值组合，否则不能级联创建
+//      // 允许指定值（方法，或者变量）
+//      schema: "admin_user",
+//      name: "user_create_with_organization",
+//      // 生成的url： post /users/user_create_with_organization。对应crud方法 create_user_with_organization
+//      // create_schemas中不支持response类型中的#号和自定义变量名
+//      expressions: ["organizations"],
+//    }
+//  ],
+//  update_schemas: [
+//    {
+//      // 允许级联创建，但必须给出对应类的唯一值或者唯一值组合，否则不能级联创建
+//      // 允许指定值（方法，或者变量）
+//      schema: "admin_user",
+//      name: "user_update_with_organization",
+//      // 生成的url： put /users/user_update_with_organization。对应crud方法 update_user_with_organization
+//      // update_schemas中不支持response类型中的#号和自定义变量名
+//      expressions: ["organizations"],
+//    }
+//  ]
+}

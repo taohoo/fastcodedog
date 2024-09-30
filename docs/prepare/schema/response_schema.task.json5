@@ -1,0 +1,10 @@
+{
+  response_schemas: [
+    {
+      module: 'sampling',
+        schema: "Task",
+        name: "task_with_drivers_and_samplers_and_orders",
+      expressions: ["drivers", "samplers", "orders"],
+    }
+  ]
+}

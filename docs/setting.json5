@@ -1,0 +1,52 @@
+{
+  project: {
+    name: "review",
+    // 代码创建者
+    author: "fastcodedog",
+    package: "review",
+    directory: "D:\\workspaces\\tourhoo\\fastcodedog2\\review"
+//    directory: "D:\\workspaces\\cti\\review_py\\review"
+  },
+  config: { // 写到配置文件中的变量
+    database: {
+      url: 'postgresql://rvuser:Cc_12345678@10.10.245.39:5432/review'
+//      url: "postgresql://ccuser:Cc_12345678@192.168.44.128:15432/ccdb"
+    },
+      logging: {
+      filename: 'review.log',
+      level: 'INFO',
+      encoding: 'utf-8',
+      datefmt: '%%Y-%%m-%%d %%H:%%M:%%S',
+      format: '%%(asctime)s - %%(levelname)s - %%(message)s - %%(filename)s:%%(lineno)d',
+    }
+  },
+  source_directory: {
+    model: "D:\\workspaces\\tourhoo\\fastcodedog2\\docs\\_build\\model",
+    schema: "D:\\workspaces\\tourhoo\\fastcodedog2\\docs\\_build\\schema",
+    crud: "D:\\workspaces\\tourhoo\\fastcodedog2\\docs\\_build\\crud",
+    api: "D:\\workspaces\\tourhoo\\fastcodedog2\\docs\\_build\\api",
+    // 临时需要通过pmd生成
+    pdm_file: "D:\\workspaces\\cti\\review_py\\docs\\fastcodedog.pdm",
+    pre_process_scripts_file: "D:\\workspaces\\tourhoo\\fastcodedog2\\docs\\prepare\\*\\*.json5"
+  },
+  oauth2: {
+    // 是否启用，默认不启用
+    enabled: true,
+    // 用户对应的Model
+    model: 'User',
+    // Model所在的模块
+    module: 'admin',
+    // 用户名字段
+    user_name_column: 'number',
+    // 用户密码字段
+    password_column: 'password',
+  },
+  extend_apps: {
+//    external_app: {
+//      from_: 'review.api.resource_service.external_api',
+//      import_: 'app',
+//      alias: 'external_app'
+//    },
+  }
+
+}

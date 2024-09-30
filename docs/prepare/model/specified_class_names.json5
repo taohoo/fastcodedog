@@ -1,0 +1,9 @@
+{
+  specified_class_names:{
+    "sale.Order": "SaleOrder",
+    "rule.Catalog": "RuleCatalog",
+    "rule.Define": "RuleDefine",
+    "rule.Condition": "RuleCondition",
+    "rule.Instance": "RuleInstance"
+  }
+}

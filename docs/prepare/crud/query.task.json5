@@ -1,0 +1,48 @@
+{
+  /*
+  * 注意crud是sqlalchemy的格式
+  */
+  // 系统会根据schema配置自动生成默认create，update，query。
+  // queries一般需要再扩展
+  queries: [
+    {
+      name: "base",
+      module: "sampling",
+      model: "Task",
+      summary: "综合查询",
+      description: "根据采样日期查询。",
+      parameters: {
+          sampling_date_begin: {
+            name: "sampling_date_begin",
+            type: 'date',
+            description: '开始时间'
+          },
+          sampling_date_end: {
+            name: "sampling_date_end",
+            type: 'date',
+            description: '结束时间'
+          },
+          sampler_name: {
+            name: "sampler_name",
+            type: 'str',
+            description: '采样人'
+          },
+          order_number: {
+              name: "order_number",
+              type: 'str',
+              description: '订单号'
+          }
+      },
+      filters: [
+          "Task.sampling_date >= sampling_date_begin",
+          "Task.sampling_date <= sampling_date_end",
+          "Task.samplers.any(Person.name.like(f'%{sampler_name}%'))",
+          "Task.orders.any(Order.number.like(f'%{order_number}%'))"
+      ],
+      orders: [
+          "Task.sampling_date",
+          "Order.number"
+      ]
+    }
+  ]
+}

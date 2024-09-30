@@ -1,0 +1,10 @@
+{
+  default_values: {
+      created_at: {
+        import_: {
+          import_: 'datetime'
+        },
+        value_expression: "datetime.datetime.now()"
+      },
+    }
+}

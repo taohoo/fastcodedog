@@ -1,0 +1,19 @@
+{
+  response_schemas: [
+    {
+      module: 'sampling',
+      schema: "Sample",
+      name: "order_cycle_round_point_sample",
+      expressions: ["order", "order.cycles", "order.points", "order.attachments", "order.cycles.rounds",
+        "order.cycles.rounds.samples", "order.cycles.rounds.samples.parameters", "order.cycles.rounds.samples.tests",
+        "order.cycles.rounds.samples.results", "order.cycles.rounds.samples.equipments",
+        "order.cycles.rounds.samples.samplers"]
+    },
+    {
+      module: 'sampling',
+      schema: "Sample",
+      name: "sampling_results",
+      expressions: ["results", "equipments", "samplers", "results.item", "results.method"]
+    }
+  ],
+}

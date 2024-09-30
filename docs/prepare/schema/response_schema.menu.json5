@@ -1,0 +1,68 @@
+{
+  response_schemas: [
+    {
+      module: 'admin',
+      schema: "Menu",
+      name: "menus_with_children",
+      expressions: ["children.children.children.children.children.children"],
+      // 改成防graphql的方式，客户端直接请求指定的json格式
+      // 数据内容都用jsonpath来指定
+      // 暂时放弃，协调工作量太大
+//      model_validate: {
+//        label: {name: 'str'},
+//        meta: {title: 'str', path: 'str'},
+//        children: {children: {  // level 2
+//          label: {name: 'str'},
+//          meta: {title: 'str', path: 'str'},
+//          children: {children: {  // level 3
+//            label: {name: 'str'},
+//            meta: {title: 'str', path: 'str'},
+//            children: {children: {  // level 4
+//              label: {name: 'str'},
+//              meta: {title: 'str', path: 'str'},
+//              children: {children: {  // level 5
+//                label: {name: 'str'},
+//                meta: {title: 'str', path: 'str'},
+//                children: {children: {  // level 6
+//                  label: {name: 'str'},
+//                  meta: {title: 'str', path: 'str'},
+//                }}
+//              }}
+//            }}
+//          }}
+//        }}
+//      }
+/*************************************************************************************
+# 转换之后的python文件
+from pydantic import BaseModel
+from pydantic.main import Model
+from typing import List, Any
+
+
+class MenusForTreeElement(BaseModel):
+    class Meta(BaseModel):
+        title: str
+        path: str
+
+        @classmethod
+        def model_validate(cls, obj: Any) -> Model:
+            return super().model_validate({
+                'title': obj.name,
+                'path': '未定义'
+            })
+
+    label: str
+    children: List['MenusForTreeElement'] = []    # 指向自己的类型，用引号引起来，不然会报错
+    meta: Meta = None
+
+    @classmethod
+    def model_validate(cls, obj: Any) -> Model:
+        return super().model_validate({
+            'label': obj.name,
+            'meta': MenusForTreeElement.Meta.model_validate(obj),
+            'children': [MenusForTreeElement.model_validate(child) for child in obj.children]
+        })
+*********************************************************/
+    }
+  ],
+}

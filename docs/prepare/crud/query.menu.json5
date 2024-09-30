@@ -1,0 +1,69 @@
+{
+  /*
+  * 注意crud是sqlalchemy的格式
+  */
+  // 系统会根据schema配置自动生成默认create，update，query。
+  // queries一般需要再扩展
+  queries: [
+    {
+      // 对应的表: "admin_menu"
+      name: "menus_by_user",
+      module: "admin",
+      model: "Menu",
+      summary: "获取用户菜单",
+      description: "根据用户的角色以及角色对应的菜单获取菜单权限。",
+      parameters: {
+        user_id: {
+          name: "user_id",
+          type: 'int',
+          nullable: false,
+          description: '用户ID'
+        },
+        platform: {
+          name: "platform",
+          type: 'str',
+          // 允许通过变量来替换注释，
+          description: '{Menu.platform}'
+        }
+      },
+      joins: [
+        'Menu.roles', 'Role.users'
+      ],
+      filters: [
+        'User.id == user_id',
+        'Menu.platform == platform'
+      ]
+    },
+    {
+      name: "base",
+      module: "admin",
+      model: "Menu",
+      summary: "综合查询",
+      description: "根据父菜单、菜单编号、菜单名称查询。",
+      parameters: {
+          parent_id: {
+            name: 'parent_id',
+            type: 'int',
+            description: '父组织id。如需设置null，在query参数中只加变量名，不赋值',
+            option_none: true,   // 允许指定使用null值
+          },
+          number: {
+            name: 'number',
+            type: 'str',
+            description: '{Menu.number}'
+          },
+          name: {
+            name: 'name',
+            type: 'str',
+            description: '{Menu.name}'
+          }
+      },
+      filters: [
+          // 如果filter中包含了nullable的参数，会条件if条件，只要这个filter中任一参数没有参数，就不会添加这个filter
+          "Menu.parent_id == parent_id",
+          "Menu.number.like(f'%{number}%')",
+          "Menu.name.like(f'%{name}%')"
+      ]
+    }
+  ]
+}

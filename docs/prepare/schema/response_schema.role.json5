@@ -1,0 +1,10 @@
+{
+  response_schemas: [
+    {
+      module: 'admin',
+      schema: "Role",
+      name: "roles_with_menus",
+      expressions: ["menus.children.children.children.children.children.children"]
+    }
+  ],
+}
