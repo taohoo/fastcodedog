@@ -101,11 +101,12 @@ def _get_example_value(param):
 def _generate_body_example(body_params, api_name):
     """Generate a JSON body example for POST/PUT requests."""
     # For schema types, generate a simple example
-    body_parts = []
+    # Usually there's only one body parameter
     for param_name, param in body_params.items():
-        # Assuming the body parameter is a schema type
-        # Generate a simple placeholder
-        body_parts.append(f'"field1": "value1", "field2": "value2"')
-        break  # Usually there's only one body parameter
+        # Generate a placeholder based on schema type
+        schema_type = param.type
+        # Return a comment indicating which schema to use
+        return f'{{"<{schema_type} fields>"}}'
     
-    return '{' + ', '.join(body_parts) + '}'
+    # Fallback if no body params found
+    return '{"field": "value"}'
