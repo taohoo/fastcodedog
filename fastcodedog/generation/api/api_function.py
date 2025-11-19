@@ -6,13 +6,16 @@ from fastcodedog.generation.base.location_finder import LocationFinder
 from fastcodedog.generation.base.required_import import Import
 from fastcodedog.generation.base.text import Text
 from fastcodedog.generation.base.variable import Variable
+from fastcodedog.util.curl_generator import generate_curl_example
 
 
 class ApiFunction(Function):
     def __init__(self, context, parent):
-        super().__init__(context.name, context=context, async_=True, parent=parent, comment=context.comment)
         self.api = parent
         self.schemas = [f'{self.api.name}', f'{self.api.name}Create', f'{self.api.name}Update']
+        # Generate enhanced comment with curl example
+        enhanced_comment = self._generate_enhanced_comment(context, parent)
+        super().__init__(context.name, context=context, async_=True, parent=parent, comment=enhanced_comment)
         # 多种条件都会用到的公共数据
         self.crud_params = self._get_crud_params()
         self.crud_imoprt = Import(LocationFinder.get_package(self.api.name, 'crud', self.api.module), as_='crud')
@@ -24,6 +27,25 @@ class ApiFunction(Function):
         self._fill_function_params()
         # 添加block
         self._fill_blocks()
+
+    def _generate_enhanced_comment(self, context, parent):
+        """Generate an enhanced comment with curl example."""
+        original_comment = context.comment or ''
+        
+        # Generate curl example
+        try:
+            curl_example = generate_curl_example(context, parent.name, self.schemas)
+            
+            # Combine original comment with curl example
+            if original_comment:
+                enhanced = f"{original_comment}\n\nExample curl command:\n{curl_example}"
+            else:
+                enhanced = f"Example curl command:\n{curl_example}"
+            
+            return enhanced
+        except Exception:
+            # If curl generation fails, return original comment
+            return original_comment
 
     def _get_crud_params(self):
         # 应该把session和option_none_params也写入到self.context.params，api中判断不加入到api_function的参数
