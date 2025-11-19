@@ -6,16 +6,22 @@ from fastcodedog.generation.base.location_finder import LocationFinder
 from fastcodedog.generation.base.required_import import Import
 from fastcodedog.generation.base.text import Text
 from fastcodedog.generation.base.variable import Variable
+from fastcodedog.util.curl_generator import generate_curl_example
 
 
 class ApiFunction(Function):
     def __init__(self, context, parent):
-        super().__init__(context.name, context=context, async_=True, parent=parent, comment=context.comment)
         self.api = parent
-        self.schemas = [f'{self.api.name}', f'{self.api.name}Create', f'{self.api.name}Update']
+        self.schemas = [f'{self.api.name}',
+                        f'{self.api.name}Create', f'{self.api.name}Update']
+        # Generate enhanced comment with curl example
+        enhanced_comment = self._generate_enhanced_comment(context, parent)
+        super().__init__(context.name, context=context,
+                         async_=True, parent=parent, comment=enhanced_comment)
         # 多种条件都会用到的公共数据
         self.crud_params = self._get_crud_params()
-        self.crud_imoprt = Import(LocationFinder.get_package(self.api.name, 'crud', self.api.module), as_='crud')
+        self.crud_imoprt = Import(LocationFinder.get_package(
+            self.api.name, 'crud', self.api.module), as_='crud')
         self.fill_selectinload = f'fill_{self.api.snake_name}_selectinload' if self.api.validate_response_model else None
 
         # 添加decorator
@@ -24,6 +30,26 @@ class ApiFunction(Function):
         self._fill_function_params()
         # 添加block
         self._fill_blocks()
+
+    def _generate_enhanced_comment(self, context, parent):
+        """Generate an enhanced comment with curl example."""
+        original_comment = context.comment or ''
+
+        # Generate curl example
+        try:
+            curl_example = generate_curl_example(
+                context, parent.name, self.schemas)
+
+            # Combine original comment with curl example
+            if original_comment:
+                enhanced = f"{original_comment}\n\nExample curl command:\n{curl_example}"
+            else:
+                enhanced = f"Example curl command:\n{curl_example}"
+
+            return enhanced
+        except Exception:
+            # If curl generation fails, return original comment
+            return original_comment
 
     def _get_crud_params(self):
         # 应该把session和option_none_params也写入到self.context.params，api中判断不加入到api_function的参数
@@ -61,7 +87,8 @@ class ApiFunction(Function):
             self.blocks.append(
                 (Text(f'query = crud.{self.fill_selectinload}(query, camel_to_snake(response_model.__name__))',
                       possible_imports=Import('camel_to_snake', LocationFinder.get_package('camel_to_snake')))))
-            self.blocks.append(Text(f'return response_model.model_validate(query.first())'))
+            self.blocks.append(
+                Text(f'return response_model.model_validate(query.first())'))
         else:
             self.blocks.append(Text(f'return query.first()'))
 
@@ -78,26 +105,31 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
         if self.fill_selectinload:
             self.blocks.append(
                 (Text(f'query = crud.{self.fill_selectinload}(query, camel_to_snake(response_model.__name__))',
-                      possible_imports=Import('camel_to_snake', LocationFinder.get_package('camel_to_snake'))
+                      possible_imports=Import(
+                          'camel_to_snake', LocationFinder.get_package('camel_to_snake'))
                       )))
         self.blocks.append(Text(f'{self.api.snake_name} = query.first()'))
         self.blocks.append(Text(
             f'if not {self.api.snake_name}:\n    raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail=f"数据未找到")',
-            possible_imports=['from fastapi import HTTPException', 'from starlette.status import HTTP_404_NOT_FOUND']
+            possible_imports=['from fastapi import HTTPException',
+                              'from starlette.status import HTTP_404_NOT_FOUND']
         ))
         if self.api.validate_response_model:
-            self.blocks.append(Text(f"""return response_model.model_validate({self.api.snake_name})"""))
+            self.blocks.append(
+                Text(f"""return response_model.model_validate({self.api.snake_name})"""))
         else:
             self.blocks.append(Text(f"""return {self.api.snake_name}"""))
 
     def _fill_return_list_blocks(self):
         self.blocks.append(Text(f'query = crud.{self.name}({", ".join(self.crud_params)})',
                                 possible_imports=self.crud_imoprt))
-        self.blocks.append(Text('skip = (page - 1) * size\nlimit = size\ntotal = query.count()'))
+        self.blocks.append(
+            Text('skip = (page - 1) * size\nlimit = size\ntotal = query.count()'))
         if self.fill_selectinload:
             self.blocks.append(
                 (Text(f'query = crud.{self.fill_selectinload}(query, camel_to_snake(response_model.__name__))',
-                      possible_imports=Import('camel_to_snake', LocationFinder.get_package('camel_to_snake'))
+                      possible_imports=Import(
+                          'camel_to_snake', LocationFinder.get_package('camel_to_snake'))
                       )))
         params_class_name = 'Params'
         if self.context.max_size:
@@ -119,8 +151,8 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
         else:
             self.blocks.append(Text(f"""return create_page(query.offset(skip).limit(limit).all(),
    total=total, params={params_class_name}(page=page, size=size))""",
-                                    possible_imports=['from fastapi_pagination import create_page',
-                                                      'from fastapi_pagination import Params']))
+                possible_imports=['from fastapi_pagination import create_page',
+                                  'from fastapi_pagination import Params']))
 
     def _fill_option_none(self):
         if any([param.option_none for param in self.context.params.values()]):
@@ -137,14 +169,18 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
         for param in self.context.params.values():
             location = 'Body' if param.type in self.schemas else \
                 ('Path' if f'{{{param.name}}}' in self.context.url else 'Query')  # 入参可能在query，path，body
-            default_value = Call(location, possible_imports=Import(location, 'fastapi'))
+            default_value = Call(
+                location, possible_imports=Import(location, 'fastapi'))
             if param.nullable:
-                default_value.params.append('None')  # default_value.params.append('None' if param.nullable else '...')
+                # default_value.params.append('None' if param.nullable else '...')
+                default_value.params.append('None')
             if param.enum:
                 default_value.params.append(f'enum={param.enum}')
             if param.description:
-                default_value.params.append(f'description="{param.description}"')
-            type = param.type if (not param.option_none or param.type == 'str') else f'{param.type} | str'
+                default_value.params.append(
+                    f'description="{param.description}"')
+            type = param.type if (
+                not param.option_none or param.type == 'str') else f'{param.type} | str'
             p = self.Parameter(param.name, type=type, nullable=param.nullable, default_value=default_value,
                                comment=param.description)
             if param.type in self.schemas:
@@ -159,7 +195,8 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
                 self.Parameter('page', type='int',
                                default_value=Call('Query', params=[1, 'ge=1', 'description="页数"'],
                                                   possible_imports='from fastapi import Query')))
-            size_params = [self.context.max_size if self.context.max_size else 100]
+            size_params = [
+                self.context.max_size if self.context.max_size else 100]
             size_params.append('ge=1')
             if self.context.max_size:
                 size_params.append(f'le={self.context.max_size}')
@@ -169,7 +206,8 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
                                default_value=Call('Query', params=size_params,
                                                   possible_imports='from fastapi import Query')))
         # 返回类型
-        if self.context.name != f'delete_{self.api.snake_name}' and self.api.validate_response_model:  # 不是删除自身的时候，可以选择返回值类型
+        # 不是删除自身的时候，可以选择返回值类型
+        if self.context.name != f'delete_{self.api.snake_name}' and self.api.validate_response_model:
             self.params['response_model'] = self.Parameter('response_model', type='BaseModel',
                                                            default_value=f'Depends({self.api.validate_response_model})',
                                                            possible_imports=['from pydantic import BaseModel',
@@ -177,7 +215,8 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
         # session依赖
         self.params['session'] = self.Parameter('session', type='Session', default_value='Depends(get_session)',
                                                 possible_imports=['from fastapi import Depends',
-                                                                  Import('Session', Db().package),
+                                                                  Import(
+                                                                      'Session', Db().package),
                                                                   Import('get_session', Db().package)])
         # Oauth2依赖
         if self.api.context.oauth2_enabled:
@@ -187,11 +226,13 @@ return {{}}""", possible_imports=[self.crud_imoprt, 'from fastapi import HTTPExc
 
     def _fill_funciton_decorators(self):
         decorator = self.Decorator(f'app.{self.context.action}')
-        decorator.params = [f"'{self.context.url}'", Variable('tags', value=self.context.tags)]
+        decorator.params = [f"'{self.context.url}'",
+                            Variable('tags', value=self.context.tags)]
         if self.name != f'delete_{self.api.snake_name}':
             decorator.params += [Variable('response_model',
                                           value=self.api.response_model if not self.context.return_list else self.api.response_model_list),
                                  Variable('response_model_exclude_none', value=True)]
         if self.context.summary:
-            decorator.params.append(Variable('summary', value=f"'{self.context.summary}'"))
+            decorator.params.append(
+                Variable('summary', value=f"'{self.context.summary}'"))
         self.decorators.append(decorator)
